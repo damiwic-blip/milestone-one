@@ -2,7 +2,11 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Section 4 Data Layer - Mock Lead Target for Apollo Mapping
+// Serve static visual assets from the 'public' folder
+app.use(express.static('public'));
+app.use(express.json());
+
+// Section 4 Data Layer - Mock Lead Target
 const leadTarget = {
     companyName: "Naples Enterprise Logistics",
     decisionMaker: "John Doe",
@@ -10,31 +14,32 @@ const leadTarget = {
     estimatedContractValue: 2500
 };
 
-// Dynamic Financial Metrics
-const SOFTWARE_COSTS = 100;         // \$100 baseline tool overhead costs
+// Dynamic Financial Metrics Baseline
+const SOFTWARE_COSTS = 100;
 
+// API Endpoint to stream calculation data to your visual interface
 app.get('/api/pipeline', (req, res) => {
-    // Calculate financial variables using the live lead target value
-    const netProfitMargin = leadTarget.estimatedContractValue - SOFTWARE_COSTS;
-    const profitPercentage = (netProfitMargin / leadTarget.estimatedContractValue) * 100;
+    const grossRevenue = leadTarget.estimatedContractValue;
+    const netProfit = grossRevenue - SOFTWARE_COSTS;
+    const profitMarginPercentage = ((netProfit / grossRevenue) * 100).toFixed(2);
 
-    console.log(`[NETWORK TRAFFIC] Inbound request. Parsing target: ${leadTarget.companyName}`);
     res.json({
-        status: "ACTIVE",
-        system: "P1 CORE ENGINE",
-        lead_capture: leadTarget,
+        success: true,
+        meta: {
+            client: leadTarget.companyName,
+            contact: leadTarget.decisionMaker,
+            email: leadTarget.corporateEmail
+        },
         financials: {
-            predicted_monthly_revenue: `$${leadTarget.estimatedContractValue}`,
-            monthly_tool_overhead: `$${SOFTWARE_COSTS}`,
-            net_profit_margin: `$${netProfitMargin}`,
-            profit_efficiency: `${profitPercentage}%`
+            gross: grossRevenue,
+            costs: SOFTWARE_COSTS,
+            net: netProfit,
+            margin: `${profitMarginPercentage}%`
         }
     });
 });
 
+// Cloud server core engine listener
 app.listen(PORT, () => {
-    console.log("=========================================");
-    console.log(`P1 ENGINE RUNNING: Listening on port ${PORT}`);
-    console.log(`Access your live Apollo simulation at: http://localhost:${PORT}/api/pipeline`);
-    console.log("=========================================");
+    console.log(`Engine cockpit live and streaming on port ${PORT}`);
 });
