@@ -21,6 +21,7 @@ const leadDatabase = [
 
 // 📞 AUTOMATED COLD OUTBOUND GENERATION ENGINE
 function generateOutboundScript(lead) {
+    const liveLink = "https://onrender.com";
     return `
 ========================================================================
 TO: ${lead.email}
@@ -36,7 +37,7 @@ Our core tracking infrastructure estimates that a localized implementation of re
 We have deployed a live, non-public data dashboard layout specifically tailored to demonstrate this real-time financial tracking calculation. 
 
 You can view the functional calculation portal directly via our authenticated endpoint:
-🔗 http://localhost:3000
+🔗 ${liveLink}
 
 Our system operates entirely under the radar with zero operational downtime to your existing legacy software structures. Let me know a convenient window to authorize a direct systems brief.
 
