@@ -1,110 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Velynxo Fleet | Enterprise Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velynxo Fleet | Enterprise Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- 🌐 MAIN ENTERPRISE INTERFACE CONTAINER -->
-    <div class="dashboard-container">
-        
-        <!-- 🧭 NAVIGATION SIDEBAR CONTAINER -->
-        <aside class="sidebar">
-            <div class="brand-logo">
-                <h2>VELYNXO FLEET</h2>
-                <span class="status-badge">● LIVE 24/7</span>
-            </div>
-            <nav class="nav-links">
-                <button class="nav-btn active" id="btn-dashboard">🖥️ Dashboard</button>
-                <button class="nav-btn" id="btn-data">📥 Data Entry</button>
-                <button class="nav-btn" id="btn-logs">⚙️ System Logs</button>
-            </nav>
-            <div class="sidebar-footer">
-                <span>v1.0.0 Stable</span>
-            </div>
-        </aside>
+<div class="dashboard-container">
 
-        <!-- 📊 MAIN DATA DISPLAY DECK -->
-        <main class="main-content">
-            
-            <!-- TOP CARD MATRIX -->
-            <header class="dashboard-header">
-                <div class="metric-card revenue-card">
-                    <h3>🟢 REVENUE PROTECTED</h3>
-                    <p class="metric-value" id="protected-display">$0.00</p>
-                </div>
-                <div class="metric-card leak-card">
-                    <h3>⚠️ IDENTIFIED LEAKS</h3>
-                    <p class="metric-value" id="leak-display">$0.00</p>
-                </div>
-            </header>
-
-            <!-- 📥 CLIENT DATA SUBMISSION GATEWAY -->
-            <section class="workspace-card" id="form-section">
-                <div class="card-header">
-                    <h2>AUTOMATED CLIENT SUBMISSION GATEWAY</h2>
-                    <p>Input active logistics parameters to trigger the real-time calculation pipeline.</p>
-                </div>
-                
-                <form id="logistics-form" class="grid-form">
-                    <div class="input-group">
-                        <label for="fleet-size">Fleet Size (Total Vehicles)</label>
-                        <input type="number" id="fleet-size" placeholder="e.g. 150" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="shipping-vol">Monthly Shipping Volume</label>
-                        <input type="number" id="shipping-vol" placeholder="e.g. 50000" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="target-margin">Target Margin Efficiency (%)</label>
-                        <input type="number" step="0.1" id="target-margin" placeholder="e.g. 85.5" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="operational-overhead">Operational Overhead (\$)</label>
-                        <input type="number" id="operational-overhead" placeholder="e.g. 120000" required>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn" id="run-pipeline-btn">
-                        ⚡ RUN REAL-TIME CALCULATION PIPELINE
-                    </button>
-                </form>
-            </section>
-
-        </main>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand-logo">
+      <h2>VELYNXO FLEET</h2>
+      <span class="status-badge">● LIVE 24/7</span>
     </div>
 
-    <!-- 🎛️ DATA PIPELINE EVENT SCRIPT -->
-    <script>
-        document.getElementById('logistics-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const payload = {
-                fleetSize: Number(document.getElementById('fleet-size').value),
-                shippingVolume: Number(document.getElementById('shipping-vol').value),
-                targetMargin: Number(document.getElementById('target-margin').value),
-                operationalOverhead: Number(document.getElementById('operational-overhead').value)
-            };
+    <nav class="nav-links">
+      <button type="button" class="nav-btn active" id="btn-dashboard">
+        🖥️ Dashboard
+      </button>
+      <button type="button" class="nav-btn" id="btn-data">
+        📥 Data Entry
+      </button>
+      <button type="button" class="nav-btn" id="btn-logs">
+        ⚙️ System Logs
+      </button>
+    </nav>
 
-            try {
-                const response = await fetch('/api/calculate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await response.json();
-                
-                document.getElementById('protected-display').innerText = `$${data.revenueProtected.toLocaleString()}`;
-                document.getElementById('leak-display').innerText = `$${data.identifiedLeaks.toLocaleString()}`;
-                
-                console.log("Pipeline run complete. Metrics successfully updated.");
-            } catch (error) {
-                console.error("Error executing live data calculations:", error);
-            }
+    <div class="sidebar-footer">
+      <span>v1.0.0</span>
+    </div>
+  </aside>
+
+  <!-- MAIN DASHBOARD -->
+  <main class="main-content">
+
+    <header class="dashboard-header" id="metrics-section">
+      <div class="metric-card revenue-card">
+        <h3>🟢 REVENUE PROTECTED</h3>
+        <p class="metric-value" id="protected-display">$0.00</p>
+      </div>
+
+      <div class="metric-card leak-card">
+        <h3>⚠️ IDENTIFIED LEAKS</h3>
+        <p class="metric-value" id="leak-display">$0.00</p>
+      </div>
+    </header>
+
+    <!-- DATA ENTRY -->
+    <section class="workspace-card" id="form-section">
+      <div class="card-header">
+        <h2>AUTOMATED CLIENT SUBMISSION GATEWAY</h2>
+        <p>
+          Input active logistics parameters to trigger
+          the calculation pipeline.
+        </p>
+      </div>
+
+      <form id="logistics-form" class="grid-form">
+
+        <div class="input-group">
+          <label for="fleet-size">Fleet Size (Total Vehicles)</label>
+          <input type="number" id="fleet-size"
+                 min="1" step="1" placeholder="e.g. 150" required>
+        </div>
+
+        <div class="input-group">
+          <label for="shipping-vol">Monthly Shipping Volume</label>
+          <input type="number" id="shipping-vol"
+                 min="1" step="1" placeholder="e.g. 50000" required>
+        </div>
+
+        <div class="input-group">
+          <label for="target-margin">Target Margin Efficiency (%)</label>
+          <input type="number" id="target-margin"
+                 min="0" max="100" step="any"
+                 placeholder="e.g. 85.5" required>
+        </div>
+
+        <div class="input-group">
+          <label for="operational-overhead">Operational Overhead ($)</label>
+          <input type="number" id="operational-overhead"
+                 min="0" step="any"
+                 placeholder="e.g. 120000" required>
+        </div>
+
+        <button type="submit" class="submit-btn" id="run-pipeline-btn">
+          ⚡ RUN REAL-TIME CALCULATION PIPELINE
+        </button>
+      </form>
+
+      <p id="pipeline-status" role="status" aria-live="polite"
+         style="margin-top:16px;color:#9caec8;"></p>
+    </section>
+
+    <!-- SYSTEM LOGS -->
+    <section class="workspace-card" id="logs-section"
+             style="display:none;">
+      <div class="card-header">
+        <h2>⚙️ SYSTEM LOGS</h2>
+        <p>Calculation pipeline activity and events.</p>
+      </div>
+
+      <div id="logs-container" role="log"
+           style="background:#090d14;
+                  padding:20px;
+                  border-radius:10px;
+                  color:#00e5ff;
+                  font-family:monospace;
+                  min-height:200px;
+                  overflow-wrap:anywhere;">
+      </div>
+
+      <button type="button" id="clear-logs"
+              style="margin-top:16px;
+                     padding:10px 18px;
+                     background:#182334;
+                     color:white;
+                     border:1px solid #334155;
+                     border-radius:8px;
+                     cursor:pointer;">
+        Clear Logs
+      </button>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // NAVIGATION
+  const dashboardBtn = document.getElementById('btn-dashboard');
+  const dataBtn = document.getElementById('btn-data');
+  const logsBtn = document.getElementById('btn-logs');
+
+  const metricsSection = document.getElementById('metrics-section');
+  const formSection = document.getElementById('form-section');
+  const logsSection = document.getElementById('logs-section');
+  const logsContainer = document.getElementById('logs-container');
+  const statusElement = document.getElementById('pipeline-status');
+  const submitButton = document.getElementById('run-pipeline-btn');
+
+  const logs = [];
+  const MAX_LOGS = 100;
+
+  function addLog(level, message) {
+    logs.push({
+      time: new Date().toLocaleString(),
+      level,
+      message
+    });
+
+    if (logs.length > MAX_LOGS) logs.shift();
+    renderLogs();
+  }
+
+  function renderLogs() {
+    logsContainer.replaceChildren();
+
+    if (logs.length === 0) {
+      const empty = document.createElement('p');
+      empty.textContent = 'No activity recorded yet.';
+      logsContainer.appendChild(empty);
+      return;
+    }
+
+    logs.forEach(entry => {
+      const line = document.createElement('p');
+      line.style.marginBottom = '12px';
+
+      line.style.color =
+        entry.level === 'ERROR' ? '#ff6b6b' :
+        entry.level === 'SUCCESS' ? '#28e6a0' : '#00e5ff';
+
+      line.textContent =
+        `[${entry.time}] [${entry.level}] ${entry.message}`;
+
+      logsContainer.appendChild(line);
+    });
+  }
+
+  function activateNav(button) {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.toggle('active', btn === button);
+    });
+  }
+
+  function showView(view) {
+    const showingLogs = view === 'logs';
+
+    metricsSection.style.display = showingLogs ? 'none' : '';
+    formSection.style.display = showingLogs ? 'none' : '';
+    logsSection.style.display = showingLogs ? 'block' : 'none';
+
+    activateNav(
+      showingLogs ? logsBtn :
+      view === 'data' ? dataBtn : dashboardBtn
+    );
+
+    if (view === 'data') {
+      formSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  dashboardBtn.addEventListener('click', () => showView('dashboard'));
+  dataBtn.addEventListener('click', () => showView('data'));
+  logsBtn.addEventListener('click', () => showView('logs'));
+
+  document.getElementById('clear-logs').addEventListener('click', () => {
+    logs.length = 0;
+    renderLogs();
+  });
+
+  // FINANCIAL CALCULATION PIPELINE
+  const money = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  });
+
+  document.getElementById('logistics-form')
+    .addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        fleetSize: Number(document.getElementById('fleet-size').value),
+        shippingVolume: Number(document.getElementById('shipping-vol').value),
+        targetMargin: Number(document.getElementById('target-margin').value),
+        operationalOverhead: Number(
+          document.getElementById('operational-overhead').value
+        )
+      };
+
+      if (
+        !Object.values(payload).every(Number.isFinite) ||
+        payload.fleetSize <= 0 ||
+        payload.shippingVolume <= 0 ||
+        payload.targetMargin < 0 ||
+        payload.targetMargin > 100 ||
+        payload.operationalOverhead < 0
+      ) {
+        statusElement.textContent = 'Please enter valid values.';
+        addLog('ERROR', 'Invalid calculation inputs.');
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = '⏳ CALCULATING...';
+      statusElement.textContent = 'Processing calculation...';
+
+      addLog('INFO', 'Calculation request started.');
+
+      try {
+        const response = await fetch('/api/calculate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
         });
-    </script>
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP ${response.status}`);
+        }
+
+        const protectedValue = Number(data.revenueProtected);
+        const leakValue = Number(data.identifiedLeaks);
+
+        if (
+          !Number.isFinite(protectedValue) ||
+          !Number.isFinite(leakValue) ||
+          data.revenueProtected == null ||
+          data.identifiedLeaks == null
+        ) {
+          throw new Error('Invalid financial response from server.');
+        }
+
+        document.getElementById('protected-display').textContent =
+          money.format(protectedValue);
+
+        document.getElementById('leak-display').textContent =
+          money.format(leakValue);
+
+        statusElement.textContent =
+          'Calculation completed. Demonstration estimates updated.';
+
+        addLog(
+          'SUCCESS',
+          `Calculation completed. Protected: ${money.format(protectedValue)}. ` +
+          `Leaks: ${money.format(leakValue)}.`
+        );
+
+      } catch (error) {
+        statusElement.textContent = `Calculation failed: ${error.message}`;
+        addLog('ERROR', `Calculation failed: ${error.message}`);
+        console.error('Pipeline error:', error);
+
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent =
+          '⚡ RUN REAL-TIME CALCULATION PIPELINE';
+      }
+    });
+
+  addLog('INFO', 'Velynxo Fleet interface initialized.');
+  showView('dashboard');
+</script>
+
 </body>
 </html>

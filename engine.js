@@ -38,7 +38,43 @@ app.get('/api/pipeline', (req, res) => {
         }
     });
 });
+app.post('/api/calculate', (req, res) => {
+    const {
+        fleetSize,
+        shippingVolume,
+        targetMargin,
+        operationalOverhead
+    } = req.body;
 
+    const values = [
+        fleetSize,
+        shippingVolume,
+        targetMargin,
+        operationalOverhead
+    ];
+
+    if (values.some(v => typeof v !== 'number' || !Number.isFinite(v) || v < 0) ||
+        fleetSize <= 0 || shippingVolume <= 0 ||
+        targetMargin > 100) {
+        return res.status(400).json({
+            error: 'Please enter valid fleet and financial values.'
+        });
+    }
+
+    // Demonstration estimates, not verified financial savings
+    const estimatedRevenue = shippingVolume * 10;
+    const estimatedCosts = operationalOverhead;
+    const marginGap = Math.max(0, targetMargin / 100 -
+        (estimatedRevenue - estimatedCosts) / estimatedRevenue);
+
+    const identifiedLeaks = Math.round(estimatedRevenue * marginGap);
+    const revenueProtected = identifiedLeaks;
+
+    res.json({
+        revenueProtected,
+        identifiedLeaks
+    });
+});
 // Cloud server core engine listener
 app.listen(PORT, () => {
     console.log(`Engine cockpit live and streaming on port ${PORT}`);
