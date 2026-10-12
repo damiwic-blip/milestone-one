@@ -190,7 +190,7 @@
   function showView(view) {
     const showingLogs = view === 'logs';
 
-    metricsSection.style.display = showingLogs ? 'none' : '';
+    metricsSection.style.display = view === 'dashboard' ? '' : 'none';
     formSection.style.display = showingLogs ? 'none' : '';
     logsSection.style.display = showingLogs ? 'block' : 'none';
 
