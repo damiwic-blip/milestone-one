@@ -1,65 +1,45 @@
-// 🌐 ENTERPRISE CLIENT PIPELINE INFRASTRUCTURE
-const fs = require('fs');
-
 // 📊 B2B TARGET ACQUISITION MATRIX
 const leadDatabase = [
-    {
-        companyName: "Apex Logistics Global",
-        executiveName: "Marcus Vance",
-        title: "Chief Operating Officer",
-        email: "m.vance@apexlogisticsglobal.com",
-        estimatedRevenueProtected: 245000
-    },
-    {
-        companyName: "Vanguard Supply Chains",
-        executiveName: "Sarah Jenkins",
-        title: "VP of Operations",
-        email: "s.jenkins@vanguardsupply.com",
-        estimatedRevenueProtected: 182000
-    }
+  {
+    companyName: "Palmetto State Transportation",
+    executiveName: "Johnny Dumit",
+    title: "Operations Manager",
+    email: "johnny@palmettostatetrans.com",
+    estimatedRevenueProtected: 245000
+  },
+  {
+    companyName: "Bulldog Hiway Express",
+    executiveName: "KC Sanders",
+    title: "Local Operations Manager",
+    email: "kcsanders@bulldoghiway.com",
+    estimatedRevenueProtected: 182000
+  }
 ];
 
-// 📞 AUTOMATED COLD OUTBOUND GENERATION ENGINE
+// 🚀 AUTOMATED COLD OUTBOUND GENERATION ENGINE
 function generateOutboundScript(lead) {
     const liveLink = "https://onrender.com";
     return `
-========================================================================
+===========================================================
 TO: ${lead.email}
-SUBJECT: System Margin Leak Detected - Action Required
-========================================================================
+SUBJECT: Urgent: $200k+ Margin Leak in ${lead.companyName} Network
+===========================================================
 
-Dear ${lead.executiveName},
+Hi ${lead.executiveName},
 
-I am reaching out regarding a localized metric analysis conducted on enterprise logistics data frameworks matching ${lead.companyName}'s operating footprint. 
+I just wrapped up a localized metric analysis on ${lead.companyName}’s operating footprint in South Carolina. My tracking infrastructure estimates a persistent leak costing your active fleet roughly $182,000 to $245,000 in unprotected margins.
 
-Our core tracking infrastructure estimates that a localized implementation of real-time pipeline monitoring would safely secure an estimated $${lead.estimatedRevenueProtected.toLocaleString()} in previously unprotected margins for your active fleet operations.
+I built a live processing node and data dashboard mapping out this exact math for you. Review the breakdown securely here: ${liveLink}
 
-We have deployed a live, non-public data dashboard layout specifically tailored to demonstrate this real-time financial tracking calculation. 
-
-You can view the functional calculation portal directly via our authenticated endpoint:
-🔗 ${liveLink}
-
-Our system operates entirely under the radar with zero operational downtime to your existing legacy software structures. Let me know a convenient window to authorize a direct systems brief.
+I will call your desk in 10 minutes to explain the math and how we patch this bleed this quarter.
 
 Best regards,
 
-[Damion Reynolds]
-Managing Partner | Core Data Net
-========================================================================`;
+Damion Reynolds
+Managing Partner | Velynxo Fleet`;
 }
 
-// 🚀 EXECUTE COLD PIPELINE OUTBOUND SCAN
-function initializeOutreachCampaign() {
-    console.log("Initializing automated target extraction loops...");
-    
-    leadDatabase.forEach((lead, index) => {
-        const fullyCompiledScript = generateOutboundScript(lead);
-        console.log(`\n[PIPELINE LOG] Generating communication routing sequence for Target #${index + 1}...`);
-        console.log(fullyCompiledScript);
-    });
-    
-    console.log("\n[STATUS] Campaign batch generation 100% complete.");
-}
-
-// Execute scanning script
-initializeOutreachCampaign();
+// Execution runner to log all targets to terminal
+leadDatabase.forEach(lead => {
+    console.log(generateOutboundScript(lead));
+});
