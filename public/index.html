@@ -294,7 +294,15 @@
           `Calculation completed. Protected: ${money.format(protectedValue)}. ` +
           `Leaks: ${money.format(leakValue)}.`
         );
-
+    // Automatically redirect the buyer to the Stripe payment screen
+    addLog('INFO', 'Initializing secure purchase checkout session...');
+    const checkoutResponse = await fetch('/api/create-checkout-session', { method: 'POST' });
+    const checkoutSession = await checkoutResponse.json();
+    if (checkoutSession.url) {
+        window.location.href = checkoutSession.url;
+    } else {
+        throw new Error('Could not initialize payment checkout link.');
+    }
       } catch (error) {
         statusElement.textContent = `Calculation failed: ${error.message}`;
         addLog('ERROR', `Calculation failed: ${error.message}`);
