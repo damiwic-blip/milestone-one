@@ -81,23 +81,15 @@ app.post('/api/calculate', (req, res) => {
     });
 });
 
-// Stripe Checkout API endpoint - Cleaned up and perfectly closed brackets
+// Stripe Checkout API endpoint for High-Ticket Enterprise Subscription
 app.post('/api/create-checkout-session', async (req, res) => {
     try {
         const session = await stripe.checkout.sessions.create({
-
             line_items: [{
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: 'Velynxo Fleet Premium Optimization',
-                        description: 'Unlock full operational analytics and leak protection tools',
-                    },
-                    unit_amount: 4900, // \$49.00 charge in cents
-                },
+                price: 'price_1UQub7BVCm6gn2Xpjn2ldvD0', // Your live \$1,500/mo product ID
                 quantity: 1,
             }],
-            mode: 'payment',
+            mode: 'subscription', // Automatically recurring monthly billing
             success_url: `${req.headers.origin}/?payment=success`,
             cancel_url: `${req.headers.origin}/`,
         });
