@@ -1,107 +1,214 @@
 require('dotenv').config();
+
 const express = require('express');
+
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+  : null;
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// Serve static visual assets from the 'public' folder
-app.use(express.static('public'));
+const DEFAULT_BASE_URL =
+  process.env.BASE_URL ||
+  `http://localhost:${PORT}`;
+
 app.use(express.json());
+app.use(express.static('public'));
 
-// Section 4 Data Layer - Mock Lead Target
+// Demonstration data only.
+// This is not connected to a real customer.
 const leadTarget = {
-    companyName: "Naples Enterprise Logistics",
-    decisionMaker: "John Doe",
-    corporateEmail: "johndoe@napleslogistics.com",
-    estimatedContractValue: 2500
+  companyName: 'Demonstration Logistics Company',
+  decisionMaker: 'Demo Contact',
+  estimatedContractValue: 2500
 };
 
-// Dynamic Financial Metrics Baseline
 const SOFTWARE_COSTS = 100;
 
-// API Endpoint to stream calculation data to your visual interface
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'online',
+    platform: 'Velynxo Fleet',
+    stripeConfigured: Boolean(stripe),
+    version: '1.0.0'
+  });
+});
+
+// Demonstration pipeline endpoint
 app.get('/api/pipeline', (req, res) => {
-    const grossRevenue = leadTarget.estimatedContractValue;
-    const netProfit = grossRevenue - SOFTWARE_COSTS;
-    const profitMarginPercentage = ((netProfit / grossRevenue) * 100).toFixed(2);
+  const grossRevenue =
+    leadTarget.estimatedContractValue;
 
-    res.json({
-        success: true,
-        meta: {
-            client: leadTarget.companyName,
-            contact: leadTarget.decisionMaker,
-            email: leadTarget.corporateEmail
-        },
-        financials: {
-            gross: grossRevenue,
-            costs: SOFTWARE_COSTS,
-            net: netProfit,
-            margin: `${profitMarginPercentage}%`
-        }
-    });
+  const netProfit =
+    grossRevenue - SOFTWARE_COSTS;
+
+  const profitMarginPercentage =
+    ((netProfit / grossRevenue) * 100).toFixed(2);
+
+  res.json({
+    success: true,
+    meta: {
+      client: leadTarget.companyName,
+      contact: leadTarget.decisionMaker,
+      contractValue: grossRevenue,
+      softwareCosts: SOFTWARE_COSTS,
+      netProfit,
+      margin: `${profitMarginPercentage}%`
+    }
+  });
 });
 
-// Original Core Pipeline Calculation Route with your exact math logic
+// Fleet leakage calculation endpoint
 app.post('/api/calculate', (req, res) => {
-    const {
-        fleetSize,
-        shippingVolume,
-        targetMargin,
-        operationalOverhead
-    } = req.body;
+  const {
+    fleetSize,
+    shippingVolume,
+    targetMargin,
+    operationalOverhead
+  } = req.body;
 
-    const values = [
-        fleetSize,
-        shippingVolume,
-        targetMargin,
-        operationalOverhead
-    ];
+  const values = [
+    fleetSize,
+    shippingVolume,
+    targetMargin,
+    operationalOverhead
+  ];
 
-    if (values.some(v => typeof v !== 'number' || !Number.isFinite(v) || v < 0) ||
-        fleetSize <= 0 || shippingVolume <= 0 ||
-        targetMargin > 100) {
-        return res.status(400).json({
-            error: 'Please enter valid fleet and financial values.'
-        });
-    }
+  const hasInvalidValue = values.some(
+    value =>
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      value < 0
+  );
 
-    // Your precise demonstration estimate formulas
-    const estimatedRevenue = shippingVolume * 10;
-    const estimatedCosts = operationalOverhead;
-    const marginGap = Math.max(0, targetMargin / 100 -
-        (estimatedRevenue - estimatedCosts) / estimatedRevenue);
-
-    const identifiedLeaks = Math.round(estimatedRevenue * marginGap);
-    const revenueProtected = identifiedLeaks;
-
-    res.json({
-        success: true,
-        revenueProtected,
-        identifiedLeaks
+  if (
+    hasInvalidValue ||
+    fleetSize <= 0 ||
+    shippingVolume <= 0 ||
+    targetMargin > 100
+  ) {
+    return res.status(400).json({
+      error: 'Please enter valid fleet and financial values.'
     });
+  }
+
+  /*
+    Demonstration assumptions:
+
+    - shippingVolume represents total monthly loads
+      handled by the entire fleet.
+    - Each monthly load is temporarily estimated
+      at $10 of revenue.
+    - operationalOverhead represents total monthly
+      operational overhead.
+    - The output is annualized by multiplying the
+      monthly estimate by 12.
+
+    These assumptions must be validated with real
+    logistics customer data before being presented
+    as a verified financial result.
+  */
+
+  const estimatedMonthlyRevenue =
+    shippingVolume * 10;
+
+  const estimatedMonthlyCosts =
+    operationalOverhead;
+
+  const currentMargin =
+    (
+      estimatedMonthlyRevenue -
+      estimatedMonthlyCosts
+    ) / estimatedMonthlyRevenue;
+
+  const marginGap = Math.max(
+    0,
+    targetMargin / 100 - currentMargin
+  );
+
+  const monthlyIdentifiedLeaks = Math.round(
+    estimatedMonthlyRevenue * marginGap
+  );
+
+  const identifiedLeaks =
+    monthlyIdentifiedLeaks * 12;
+
+  /*
+    Illustrative recovery assumption only.
+
+    This does not guarantee that Velynxo will recover
+    80% of the estimated leakage. It must be validated
+    with actual customer data.
+  */
+
+  const recoveryRate = 0.80;
+
+  const recoverableOpportunity = Math.round(
+    identifiedLeaks * recoveryRate
+  );
+
+  // Kept for compatibility with the existing frontend/API.
+  const revenueProtected =
+    recoverableOpportunity;
+
+  return res.json({
+    success: true,
+    identifiedLeaks,
+    recoverableOpportunity,
+    revenueProtected,
+    recoveryRate
+  });
 });
 
-// Stripe Checkout API endpoint for High-Ticket Enterprise Subscription
+// Stripe Checkout endpoint
 app.post('/api/create-checkout-session', async (req, res) => {
-    try {
-        const session = await stripe.checkout.sessions.create({
-            line_items: [{
-                price: 'price_1UQub7BVCm6gn2Xpjn2ldvD0', // Your live \$1,500/mo product ID
-                quantity: 1,
-            }],
-            mode: 'subscription', // Automatically recurring monthly billing
-            success_url: `${req.headers.origin}/?payment=success`,
-            cancel_url: `${req.headers.origin}/`,
-        });
-
-        res.json({ url: session.url });
-    } catch (error) {
-        console.error("Stripe Error:", error.message);
-        res.status(500).json({ error: error.message });
+  try {
+    if (!stripe) {
+      return res.status(503).json({
+        error: 'Stripe is not configured on this server.'
+      });
     }
+
+    const baseUrl =
+      process.env.BASE_URL ||
+      req.headers.origin ||
+      DEFAULT_BASE_URL;
+
+    const session =
+      await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: 'price_1UQub7BVCm6gn2Xpjn2ldvD0',
+            quantity: 1
+          }
+        ],
+        mode: 'subscription',
+        success_url:
+          `${baseUrl}/?payment=success`,
+        cancel_url:
+          `${baseUrl}/?payment=cancelled`
+      });
+
+    return res.json({
+      url: session.url
+    });
+  } catch (error) {
+    console.error(
+      'Stripe Error:',
+      error.message
+    );
+
+    return res.status(500).json({
+      error: 'Unable to create checkout session.'
+    });
+  }
 });
 
-// Cloud server core engine listener
+// Start server
 app.listen(PORT, () => {
-    console.log(`Engine cockpit live and streaming on port ${PORT}`);
+  console.log(
+    `Velynxo Fleet server is running on port ${PORT}`
+  );
 });
